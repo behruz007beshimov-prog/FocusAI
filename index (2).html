@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FOCUS AI Audit</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#0d1f3c;--red:#d32f2f;--muted:#4a5670;--bg:#eef2f7}
+html,body{height:100%;overflow:hidden}
+body{
+  background:radial-gradient(circle at 50% 50%,#ffffff 0%,var(--bg) 70%);
+  font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--navy);user-select:none;-webkit-user-select:none;touch-action:none
+}
+#stage{position:fixed;inset:0;overflow:hidden}
+
+/* ---------- LOGO ---------- */
+#logo{
+  position:absolute;left:50%;top:50%;z-index:5;
+  transform:translate(-50%,-50%);text-align:center;will-change:transform
+}
+.word{
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:clamp(60px,10.5vw,150px);line-height:1;letter-spacing:-0.02em
+}
+.dotbox{position:relative;width:.72em;height:.72em;margin:0 .02em}
+.dotbox i{
+  position:absolute;width:.17em;height:.17em;border-radius:50%;
+  background:var(--navy);transform:translate(-50%,-50%)
+}
+.dotbox i.r{background:var(--red);width:.2em;height:.2em;left:50%;top:50%}
+.dotbox i:nth-child(1){left:50%;top:12%}
+.dotbox i:nth-child(2){left:84%;top:31%}
+.dotbox i:nth-child(3){left:84%;top:69%}
+.dotbox i:nth-child(4){left:50%;top:88%}
+.dotbox i:nth-child(5){left:16%;top:69%}
+.dotbox i:nth-child(6){left:16%;top:31%}
+.sub{
+  font-weight:700;font-size:clamp(13px,1.9vw,24px);
+  letter-spacing:.75em;margin-top:.7em;padding-left:.75em
+}
+.bar{display:flex;width:clamp(240px,48vw,560px);height:6px;margin:1em auto 0}
+.bar i{flex:1;background:var(--navy)}
+.bar b{flex:1;background:var(--red)}
+
+#glow{
+  position:absolute;left:50%;top:50%;width:70vmin;height:70vmin;
+  transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,rgba(211,47,47,.2) 0%,rgba(211,47,47,0) 65%);
+  opacity:0;z-index:1;pointer-events:none
+}
+#links{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible}
+#links path{fill:none;stroke:var(--red);stroke-width:1.6;stroke-linecap:round;opacity:.75}
+
+/* ---------- KARTOCHKALAR ---------- */
+.item{
+  position:absolute;left:50%;top:50%;width:280px;
+  padding:9px 9px 14px;border-radius:16px;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(13,31,60,.1);
+  box-shadow:0 16px 40px rgba(13,31,60,.15);
+  z-index:2;opacity:0;will-change:transform,opacity
+}
+.art{border-radius:10px;overflow:hidden;background:#f3f6fb}
+.art svg{display:block;width:100%;height:auto}
+.txt{padding:10px 6px 0}
+.item h3{
+  font-size:13px;font-weight:800;letter-spacing:.02em;
+  text-transform:uppercase;margin-bottom:5px;line-height:1.3;
+  display:flex;align-items:center;gap:7px
+}
+.item h3::before{
+  content:"";width:7px;height:7px;border-radius:50%;flex:none;
+  background:var(--red);box-shadow:0 0 8px var(--red)
+}
+.item p{font-size:12px;color:var(--muted);line-height:1.45;padding-left:14px}
+
+/* ---------- HINT ---------- */
+#hint{
+  position:fixed;left:0;right:0;bottom:18px;text-align:center;
+  font-size:13px;color:#5b6780;z-index:10;pointer-events:none
+}
+#hint span{font-weight:700;color:var(--navy)}
+
+@media (max-width:700px){
+  .item{width:200px;padding:6px 6px 10px}
+  .item h3{font-size:10.5px}
+  .item p{font-size:9.5px}
+  .txt{padding:6px 3px 0}
+}
+</style>
+</head>
+<body>
+
+<!-- Umumiy gradientlar -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="chrome" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".35" stop-color="#9aa3b2"/>
+      <stop offset=".6" stop-color="#2b3140"/>
+      <stop offset="1" stop-color="#d9dee8"/>
+    </linearGradient>
+    <radialGradient id="redglow">
+      <stop offset="0" stop-color="#ff5a4e" stop-opacity="1"/>
+      <stop offset=".5" stop-color="#d32f2f" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#d32f2f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cubeTop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7d8594"/><stop offset="1" stop-color="#4a5260"/>
+    </linearGradient>
+    <linearGradient id="cubeL" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a414e"/><stop offset="1" stop-color="#1c2029"/>
+    </linearGradient>
+    <linearGradient id="cubeR" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4b5362"/><stop offset="1" stop-color="#262b36"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div id="stage">
+  <svg id="links" viewBox="0 0 1 1" preserveAspectRatio="none"></svg>
+  <div id="glow"></div>
+
+  <!-- 1. Dars xonasi + CRM -->
+  <div class="item" data-x="-0.38" data-y="-0.2" data-r="-3" data-d="0.05">
+    <div class="art">
+      <svg viewBox="0 0 260 96">
+        <text x="14" y="16" font-size="9" font-weight="700" fill="#0d1f3c">REAL</text>
+        <g fill="#0d1f3c" opacity=".75">
+          <rect x="14" y="36" width="24" height="8" rx="2"/><circle cx="26" cy="31" r="3.5"/>
+          <rect x="50" y="36" width="24" height="8" rx="2"/><circle cx="62" cy="31" r="3.5"/>
+          <rect x="86" y="36" width="24" height="8" rx="2"/><circle cx="98" cy="31" r="3.5"/>
+          <rect x="14" y="56" width="24" height="8" rx="2"/><circle cx="26" cy="51" r="3.5"/>
+          <rect x="50" y="56" width="24" height="8" rx="2"/><circle cx="62" cy="51" r="3.5"/>
+          <rect x="86" y="56" width="24" height="8" rx="2"/><circle cx="98" cy="51" r="3.5"/>
+          <rect x="14" y="76" width="24" height="8" rx="2"/><circle cx="26" cy="71" r="3.5"/>
+          <rect x="50" y="76" width="24" height="8" rx="2"/><circle cx="62" cy="71" r="3.5"/>
+        </g>
+        <g fill="#d32f2f">
+          <rect x="86" y="76" width="24" height="8" rx="2"/><circle cx="98" cy="71" r="3.5"/>
+          <rect x="122" y="56" width="24" height="8" rx="2" opacity=".35"/><circle cx="134" cy="51" r="3.5" opacity=".35"/>
+        </g>
+        <path d="M122 40 C150 40 160 40 178 36 M122 60 C150 60 160 50 178 46 M122 80 C150 80 158 60 178 56" stroke="#d32f2f" stroke-width="1.1" fill="none" opacity=".7"/>
+        <rect x="178" y="14" width="66" height="70" rx="5" fill="#fff" stroke="#0d1f3c" stroke-width="1.2"/>
+        <rect x="178" y="14" width="66" height="12" rx="5" fill="#0d1f3c"/>
+        <g stroke="#c3cbd9" stroke-width="3" stroke-linecap="round">
+          <line x1="186" y1="36" x2="236" y2="36"/><line x1="186" y1="48" x2="230" y2="48"/>
+          <line x1="186" y1="60" x2="236" y2="60"/><line x1="186" y1="72" x2="222" y2="72"/>
+        </g>
+        <text x="182" y="90" font-size="8" font-weight="700" fill="#d32f2f">CRM</text>
+      </svg>
+    </div>
+    <div class="txt">
+      <h3>AI o‘quv tahlili &amp; dars davomati</h3>
+      <p>Haqiqiy va CRM davomati o‘rtasidagi farq</p>
+    </div>
+  </div>
+
+  <!-- 2. Teacher quality -->
+  <div class="item" data-x="-0.38" data-y="0.12" data-r="3" data-d="0.12">
+    <div class="art">
+      <svg viewBox="0 0 260 96">
+        <rect x="26" y="14" width="74" height="74" rx="7" fill="#fff" stroke="#0d1f3c" stroke-width="1.2"/>
+        <rect x="48" y="7" width="30" height="13" rx="3" fill="#0d1f3c"/>
+        <g fill="none" stroke="#0d1f3c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="34,38 39,43 46,34"/><line x1="54" y1="38" x2="92" y2="38" stroke="#c3cbd9"/>
+          <polyline points="34,54 39,59 46,50"/><line x1="54" y1="54" x2="92" y2="54" stroke="#c3cbd9"/>
+          <polyline points="34,70 39,75 46,66" stroke="#d32f2f"/><line x1="54" y1="70" x2="82" y2="70" stroke="#d32f2f"/>
+        </g>
+        <text x="132" y="22" font-size="12" fill="#d32f2f" letter-spacing="1">★★★★☆</text>
+        <circle cx="186" cy="40" r="17" fill="#0d1f3c"/>
+        <circle cx="186" cy="36" r="5.5" fill="#fff" opacity=".9"/>
+        <path d="M168 90 Q186 58 204 90 Z" fill="#0d1f3c" opacity=".85"/>
+        <rect x="140" y="66" width="32" height="14" rx="7" fill="none" stroke="#d32f2f" stroke-width="1.2"/>
+        <text x="146" y="76" font-size="8" font-weight="700" fill="#d32f2f">QA</text>
+      </svg>
+    </div>
+    <div class="txt">
+      <h3>O‘qituvchi sifati tahlili</h3>
+      <p>Davomatni tekshirish &amp; dars davomati</p>
+    </div>
+  </div>
+
+  <!-- 3. A.I. audit yadrosi -->
+  <div class="item" data-x="0" data-y="-0.36" data-r="-2" data-d="0">
+    <div class="art">
+      <svg viewBox="0 0 260 96">
+        <circle cx="130" cy="50" r="40" fill="none" stroke="#d32f2f" stroke-opacity=".25" stroke-width="1"/>
+        <circle cx="130" cy="50" r="30" fill="none" stroke="#d32f2f" stroke-opacity=".4" stroke-width="1"/>
+        <circle cx="130" cy="52" r="26" fill="url(#redglow)"/>
+        <polygon points="130,14 174,36 130,58 86,36" fill="url(#cubeTop)"/>
+        <polygon points="86,36 130,58 130,92 86,70" fill="url(#cubeL)"/>
+        <polygon points="130,58 174,36 174,70 130,92" fill="url(#cubeR)"/>
+        <circle cx="130" cy="44" r="5" fill="#d32f2f"/>
+        <circle cx="130" cy="44" r="2" fill="#ffb4ad"/>
+      </svg>
+    </div>
+    <div class="txt">
+      <h3>A.I. audit yadrosi</h3>
+      <p>Anomaliyalarni aniqlovchi asosiy tizim</p>
+    </div>
+  </div>
+
+  <!-- 4. Auditor Decision Desk -->
+  <div class="item" data-x="0.3" data-y="-0.36" data-r="3" data-d="0.1">
+    <div class="art">
+      <svg viewBox="0 0 260 96">
+        <path d="M130 62 Q150 78 130 92" stroke="url(#chrome)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <ellipse cx="130" cy="34" rx="30" ry="24" fill="url(#chrome)"/>
+        <ellipse cx="130" cy="20" rx="20" ry="7" fill="#1b202b"/>
+        <ellipse cx="130" cy="38" rx="14" ry="6" fill="#0d1f3c" opacity=".6"/>
+        <circle cx="130" cy="36" r="3.5" fill="#d32f2f"/>
+        <circle cx="130" cy="36" r="10" fill="none" stroke="#d32f2f" stroke-opacity=".4"/>
+      </svg>
+    </div>
+    <div class="txt">
+      <h3>Auditor qaror markazi (gibrid qatlam)</h3>
+      <p>Chegaraviy holatlarda inson aralashuvi, yakuniy qaror</p>
+    </div>
+  </div>
+
+  <!-- 5. Finance & Budget -->
+  <div class="item" data-x="-0.02" data-y="0.36" data-r="2" data-d="0.15">
+    <div class="art">
+      <svg viewBox="0 0 260 96">
+        <path d="M34 8 H104 V92 l-6-5 -6 5 -6-5 -6 5 -6-5 -6 5 -6-5 -6 5 -6-5 -6 5 -6-5 -6 5 V8 Z" fill="#fff" stroke="#0d1f3c" stroke-width="1.2" stroke-linejoin="round"/>
+        <g stroke="#c3cbd9" stroke-width="3" stroke-linecap="round">
+          <line x1="44" y1="24" x2="94" y2="24"/><line x1="44" y1="36" x2="90" y2="36"/>
+          <line x1="44" y1="48" x2="94" y2="48"/><line x1="44" y1="60" x2="82" y2="60"/>
+        </g>
+        <text x="44" y="78" font-size="10" font-weight="800" fill="#d32f2f">FAKE?</text>
+        <line x1="124" y1="18" x2="124" y2="84" stroke="#0d1f3c" stroke-width="1.6"/>
+        <polygon points="124,18 150,27 124,36" fill="#d32f2f"/>
+        <text x="158" y="34" font-size="13" font-style="italic" font-family="Georgia,serif" fill="#0d1f3c">UZS = $</text>
+        <text x="158" y="56" font-size="12" font-style="italic" font-family="Georgia,serif" fill="#0d1f3c">Σ (F² + ¾M)</text>
+        <polyline points="158,70 164,76 176,64" fill="none" stroke="#0d1f3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="186,70 192,76 204,64" fill="none" stroke="#d32f2f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="txt">
+      <h3>Moliya &amp; byudjet yaxlitligi</h3>
+      <p>Firibgarlik va soxta cheklarni “qizil bayroq” orqali aniqlash</p>
+    </div>
+  </div>
+
+  <!-- 6. Sales & audit logs -->
+  <div class="item" data-x="0.38" data-y="-0.12" data-r="-3" data-d="0.08">
+    <div class="art">
+      <svg viewBox="0 0 260 96">
+        <path d="M8 48 Q18 18 28 48 T48 48 T68 48 T88 48 T108 48 T128 48" fill="none" stroke="#0d1f3c" stroke-width="2"/>
+        <path d="M8 56 Q18 74 28 56 T48 56 T68 56 T88 56 T108 56 T128 56" fill="none" stroke="#d32f2f" stroke-width="1.6" opacity=".8"/>
+        <path d="M8 52 Q18 30 28 52 T48 52 T68 52 T88 52 T108 52 T128 52" fill="none" stroke="#0d1f3c" stroke-width=".8" opacity=".35"/>
+        <circle cx="200" cy="26" r="14" fill="#0d1f3c"/>
+        <rect x="194" y="18" width="12" height="16" rx="3" fill="none" stroke="#fff" stroke-width="1.6"/>
+        <g font-size="8" font-weight="700" fill="#0d1f3c">
+          <rect x="150" y="50" width="100" height="14" rx="3" fill="#fff" stroke="#c3cbd9"/>
+          <text x="156" y="60">CALL 00:42</text>
+          <rect x="150" y="68" width="100" height="14" rx="3" fill="#fff" stroke="#c3cbd9"/>
+          <text x="156" y="78">CALL 03:10</text>
+          <rect x="150" y="86" width="100" height="0" rx="3" fill="none"/>
+        </g>
+        <rect x="216" y="50" width="34" height="14" rx="3" fill="#d32f2f"/>
+        <text x="221" y="60" font-size="7" font-weight="800" fill="#fff">STT</text>
+      </svg>
+    </div>
+    <div class="txt">
+      <h3>Savdo ko‘nikmalari &amp; audit jurnallari</h3>
+      <p>Nutqni matnga o‘girish tahlili, qo‘ng‘iroq jurnallari</p>
+    </div>
+  </div>
+
+  <!-- 7. Fake lost lead -->
+  <div class="item" data-x="0.36" data-y="0.12" data-r="4" data-d="0.18">
+    <div class="art">
+      <svg viewBox="0 0 260 96">
+        <rect x="18" y="10" width="118" height="78" rx="7" fill="#fff" stroke="#0d1f3c" stroke-width="1.2"/>
+        <rect x="18" y="10" width="118" height="14" rx="7" fill="#0d1f3c"/>
+        <g stroke="#c3cbd9" stroke-width="3" stroke-linecap="round">
+          <line x1="28" y1="36" x2="108" y2="36"/><line x1="28" y1="48" x2="98" y2="48"/>
+          <line x1="28" y1="60" x2="106" y2="60"/><line x1="28" y1="72" x2="88" y2="72"/>
+        </g>
+        <g transform="rotate(-12 80 52)">
+          <rect x="44" y="40" width="74" height="22" rx="3" fill="none" stroke="#d32f2f" stroke-width="2"/>
+          <text x="50" y="56" font-size="11" font-weight="900" fill="#d32f2f" letter-spacing="1">SOXTA LEAD</text>
+        </g>
+        <path d="M152 30 h72 a8 8 0 0 1 8 8 v16 a8 8 0 0 1 -8 8 h-40 l-12 9 v-9 h-20 a8 8 0 0 1 -8 -8 v-16 a8 8 0 0 1 8 -8 z" fill="#0d1f3c"/>
+        <path d="M162 46 Q170 36 178 46 T194 46 T210 46" fill="none" stroke="#fff" stroke-width="1.6"/>
+        <path d="M212 46 Q218 40 224 46" fill="none" stroke="#d32f2f" stroke-width="1.6"/>
+        <text x="152" y="88" font-size="8" font-weight="700" fill="#d32f2f">STT TRANSKRIPT</text>
+      </svg>
+    </div>
+    <div class="txt">
+      <h3>Soxta yo‘qotilgan lead tahlili</h3>
+      <p>STT transkripti orqali tekshiruv</p>
+    </div>
+  </div>
+
+  <!-- 8. Revenue assurance -->
+  <div class="item" data-x="0.3" data-y="0.36" data-r="-3" data-d="0.22">
+    <div class="art">
+      <svg viewBox="0 0 260 96">
+        <text x="16" y="18" font-size="9" font-weight="700" fill="#0d1f3c">REVENUE</text>
+        <line x1="16" y1="86" x2="244" y2="86" stroke="#c3cbd9" stroke-width="1"/>
+        <rect x="36" y="50" width="20" height="36" rx="3" fill="#0d1f3c" opacity=".85"/>
+        <rect x="70" y="40" width="20" height="46" rx="3" fill="#0d1f3c" opacity=".85"/>
+        <rect x="104" y="46" width="20" height="40" rx="3" fill="#0d1f3c" opacity=".85"/>
+        <rect x="138" y="30" width="20" height="56" rx="3" fill="#0d1f3c" opacity=".85"/>
+        <rect x="172" y="60" width="20" height="26" rx="3" fill="#d32f2f"/>
+        <polyline points="46,44 80,34 114,40 148,24 182,54" fill="none" stroke="#d32f2f" stroke-width="1.6" stroke-dasharray="4 3"/>
+        <circle cx="182" cy="54" r="3" fill="#d32f2f"/>
+        <g transform="translate(214 30)">
+          <line x1="0" y1="0" x2="0" y2="30" stroke="#0d1f3c" stroke-width="1.6"/>
+          <line x1="-14" y1="8" x2="14" y2="8" stroke="#0d1f3c" stroke-width="1.6"/>
+          <path d="M-14 8 l-6 12 h12 z M14 8 l-6 12 h12 z" fill="none" stroke="#0d1f3c" stroke-width="1.2"/>
+        </g>
+      </svg>
+    </div>
+    <div class="txt">
+      <h3>Daromad kafolati</h3>
+      <p>Rad etishni aniqlash</p>
+    </div>
+  </div>
+
+  <!-- LOGO -->
+  <div id="logo">
+    <div class="word">
+      <span>F</span>
+      <div class="dotbox">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i class="r"></i>
+      </div>
+      <span>CUS</span>
+    </div>
+    <div class="sub">AI AUDIT</div>
+    <div class="bar"><i></i><b></b></div>
+  </div>
+</div>
+
+<div id="hint">Yuqoriga scroll qiling — <span>elementlar ochiladi</span> &nbsp;·&nbsp; Pastga scroll qiling — <span>logo ichiga yig‘iladi</span></div>
+
+<script>
+const logo = document.getElementById('logo');
+const glow = document.getElementById('glow');
+const links = document.getElementById('links');
+
+const cfg = [...document.querySelectorAll('.item')].map(el => {
+  const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  p.setAttribute('pathLength', '1');
+  p.setAttribute('stroke-dasharray', '1 1');
+  links.appendChild(p);
+  return {
+    el,
+    fx: parseFloat(el.dataset.x),
+    fy: parseFloat(el.dataset.y),
+    rot: parseFloat(el.dataset.r),
+    d: parseFloat(el.dataset.d),
+    path: p
+  };
+});
+
+let target = 0; // 0 = logo, 1 = to'liq ochilgan
+let cur = 0;    // silliq animatsiya holati
+
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+function frame() {
+  cur += (target - cur) * 0.08;
+  if (Math.abs(target - cur) < 0.0005) cur = target;
+
+  const W = innerWidth, H = innerHeight;
+  const k = W < 700 ? 0.85 : 1;
+  links.setAttribute('viewBox', `${-W / 2} ${-H / 2} ${W} ${H}`);
+  links.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+  for (const c of cfg) {
+    const lt = clamp((cur - c.d) / 0.55, 0, 1);
+    const e = ease(lt);
+    const x = c.fx * W * k * e;
+    const y = c.fy * H * e;
+    const r = c.rot * (1 - e);
+    const s = 0.4 + 0.6 * e;
+
+    c.el.style.opacity = e;
+    c.el.style.transform =
+      `translate(-50%,-50%) translate(${x}px,${y}px) rotate(${r}deg) scale(${s})`;
+
+    // Markazdan kartochkaga ketadigan qizil chiziq
+    const ex = x, ey = y;
+    const mx = ex * 0.45, my = ey * 0.1;
+    c.path.setAttribute('d', `M0 0 Q ${mx} ${my} ${ex} ${ey}`);
+    c.path.setAttribute('stroke-dashoffset', (1 - e).toFixed(4));
+    c.path.style.opacity = e * 0.75;
+  }
+
+  logo.style.transform = `translate(-50%,-50%) scale(${1 - 0.12 * cur})`;
+  glow.style.opacity = cur * 0.9;
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* Scroll (kompyuter) */
+addEventListener('wheel', e => {
+  e.preventDefault();
+  target = clamp(target - e.deltaY / 900, 0, 1);
+}, { passive: false });
+
+/* Scroll (telefon) */
+let lastY = 0;
+addEventListener('touchstart', e => { lastY = e.touches[0].clientY; }, { passive: true });
+addEventListener('touchmove', e => {
+  e.preventDefault();
+  const y = e.touches[0].clientY;
+  target = clamp(target + (lastY - y) / 500, 0, 1);
+  lastY = y;
+}, { passive: false });
+
+/* Klaviatura */
+addEventListener('keydown', e => {
+  if (['ArrowUp', 'PageUp'].includes(e.key)) target = clamp(target + 0.1, 0, 1);
+  if (['ArrowDown', 'PageDown'].includes(e.key)) target = clamp(target - 0.1, 0, 1);
+});
+</script>
+</body>
+</html>
